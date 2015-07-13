@@ -46,6 +46,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -532,21 +533,23 @@ public class InAppBrowser extends CordovaPlugin {
                 // Toolbar layout
                 RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
                 //Please, no more black!
-                toolbar.setBackgroundColor(android.graphics.Color.LTGRAY);
+                toolbar.setBackgroundColor(0XFFB93221);
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(44)));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
                 toolbar.setHorizontalGravity(Gravity.LEFT);
                 toolbar.setVerticalGravity(Gravity.TOP);
 
                 // Action Button Container layout
-                RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
+                /*RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
                 actionButtonContainer.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 actionButtonContainer.setHorizontalGravity(Gravity.LEFT);
                 actionButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
-                actionButtonContainer.setId(1);
+                actionButtonContainer.setId(1);*/
+
+                Resources activityRes = cordova.getActivity().getResources();
 
                 // Back button
-                Button back = new Button(cordova.getActivity());
+                /*Button back = new Button(cordova.getActivity());
                 RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
                 backLayoutParams.addRule(RelativeLayout.ALIGN_LEFT);
                 back.setLayoutParams(backLayoutParams);
@@ -567,10 +570,10 @@ public class InAppBrowser extends CordovaPlugin {
                     public void onClick(View v) {
                         goBack();
                     }
-                });
+                });*/
 
                 // Forward button
-                Button forward = new Button(cordova.getActivity());
+                /*Button forward = new Button(cordova.getActivity());
                 RelativeLayout.LayoutParams forwardLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
                 forwardLayoutParams.addRule(RelativeLayout.RIGHT_OF, 2);
                 forward.setLayoutParams(forwardLayoutParams);
@@ -590,10 +593,10 @@ public class InAppBrowser extends CordovaPlugin {
                     public void onClick(View v) {
                         goForward();
                     }
-                });
+                });*/
 
                 // Edit Text Box
-                edittext = new EditText(cordova.getActivity());
+                /*edittext = new EditText(cordova.getActivity());
                 RelativeLayout.LayoutParams textLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
                 textLayoutParams.addRule(RelativeLayout.RIGHT_OF, 1);
                 textLayoutParams.addRule(RelativeLayout.LEFT_OF, 5);
@@ -613,28 +616,70 @@ public class InAppBrowser extends CordovaPlugin {
                         }
                         return false;
                     }
-                });
+                });*/
+
+                ImageView iv = new ImageView(cordova.getActivity());
+                int logotextid = activityRes.getIdentifier("logotext", "drawable", cordova.getActivity().getPackageName());
+                iv.setImageResource(logotextid);
+                RelativeLayout.LayoutParams lparams = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        this.dpToPixels(20));
+                lparams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                lparams.addRule(RelativeLayout.CENTER_VERTICAL);
+                iv.setLayoutParams(lparams);
+                toolbar.addView(iv);
 
                 // Close/Done button
                 Button close = new Button(cordova.getActivity());
-                RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(this.dpToPixels(40), this.dpToPixels(40));
+                closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 close.setLayoutParams(closeLayoutParams);
-                forward.setContentDescription("Close Button");
-                close.setId(5);
-                int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
-                Drawable closeIcon = activityRes.getDrawable(closeResId);
+                close.setContentDescription("Close");
+                close.setId(4);
+                int closeResId = activityRes.getIdentifier("back_btn", "drawable", cordova.getActivity().getPackageName());
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
                 {
+                    Drawable closeIcon = activityRes.getDrawable(closeResId);
                     close.setBackgroundDrawable(closeIcon);
                 }
                 else
                 {
-                    close.setBackground(closeIcon);
+                    //close.setBackground(closeIcon);
+                    close.setBackgroundResource(closeResId);
                 }
                 close.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         closeDialog();
+                    }
+                });
+
+                // Share button setup
+                Button share = new Button(cordova.getActivity());
+                RelativeLayout.LayoutParams shareLayoutParams = new RelativeLayout.LayoutParams(this.dpToPixels(40), this.dpToPixels(40));
+                shareLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                share.setLayoutParams(shareLayoutParams);
+                share.setId(5);
+
+                int shareResId = activityRes.getIdentifier("share_btn", "drawable", cordova.getActivity().getPackageName());
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
+                {
+                    Drawable shareIcon = activityRes.getDrawable(shareResId);
+                    share.setBackgroundDrawable(shareIcon);
+                }
+                else
+                {
+                    share.setBackgroundResource(shareResId);
+                }
+                share.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        // SHARE THE THING!!!
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                        i.setType("text/plain");
+                        // For a file in shared storage.  For data in private storage, use a ContentProvider.
+                        i.putExtra(Intent.EXTRA_SUBJECT, inAppWebView.getTitle()); // Not the best way, but it will do do now
+                        i.putExtra(Intent.EXTRA_TEXT, url.replace("attentive.us/a/", "attentive.us/s/"));
+                        cordova.getActivity().startActivity(Intent.createChooser(i, "Choose!"));
                     }
                 });
 
@@ -666,7 +711,13 @@ public class InAppBrowser extends CordovaPlugin {
                     CookieManager.getInstance().removeSessionCookie();
                 }
 
-                inAppWebView.loadUrl(url);
+                //inAppWebView.loadUrl(url);
+                inAppWebView.loadData("<html><head><META HTTP-EQUIV=\"refresh\" CONTENT=\"0;URL=" + url +"\">" +
+                                "</head>" +
+                                "<body style='text-align:center;padding-top:15rem;'>" +
+                                "<img style=\"width:30%\" src=\"https://storage.googleapis.com/attentive/animation_no_flicks.gif\">" +
+                                "</body></html>",
+                        "text/html", "UTF-8");
                 inAppWebView.setId(6);
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(true);
@@ -674,13 +725,15 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.requestFocusFromTouch();
 
                 // Add the back and forward buttons to our action button container layout
-                actionButtonContainer.addView(back);
-                actionButtonContainer.addView(forward);
+                //actionButtonContainer.addView(back);
+                //actionButtonContainer.addView(forward);
 
                 // Add the views to our toolbar
-                toolbar.addView(actionButtonContainer);
-                toolbar.addView(edittext);
+                //toolbar.addView(actionButtonContainer);
+                //toolbar.addView(edittext);
                 toolbar.addView(close);
+                toolbar.addView(share);
+
 
                 // Don't add the toolbar if its been disabled
                 if (getShowLocationBar()) {
@@ -751,7 +804,7 @@ public class InAppBrowser extends CordovaPlugin {
          */
         public InAppBrowserClient(CordovaWebView webView, EditText mEditText) {
             this.webView = webView;
-            this.edittext = mEditText;
+            //this.edittext = mEditText;
         }
 
         /**
@@ -822,9 +875,9 @@ public class InAppBrowser extends CordovaPlugin {
                 newloc = "http://" + url;
             }
 
-            if (!newloc.equals(edittext.getText().toString())) {
+            /*if (!newloc.equals(edittext.getText().toString())) {
                 edittext.setText(newloc);
-            }
+            }*/
 
             try {
                 JSONObject obj = new JSONObject();
