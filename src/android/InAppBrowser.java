@@ -540,11 +540,15 @@ public class InAppBrowser extends CordovaPlugin {
                 toolbar.setVerticalGravity(Gravity.TOP);
 
                 // Action Button Container layout
-                /*RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
-                actionButtonContainer.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                actionButtonContainer.setHorizontalGravity(Gravity.LEFT);
+                RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
+                //RelativeLayout.LayoutParams buttonContainerParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams buttonContainerParams = new RelativeLayout.LayoutParams(this.dpToPixels(100), this.dpToPixels(100));
+                actionButtonContainer.setPadding(this.dpToPixels(5), this.dpToPixels(0), this.dpToPixels(5), this.dpToPixels(0));
+                buttonContainerParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                actionButtonContainer.setLayoutParams(buttonContainerParams);
+                actionButtonContainer.setHorizontalGravity(Gravity.RIGHT);
                 actionButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
-                actionButtonContainer.setId(1);*/
+                actionButtonContainer.setId(1);
 
                 Resources activityRes = cordova.getActivity().getResources();
 
@@ -618,7 +622,7 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                 });*/
 
-                ImageView iv = new ImageView(cordova.getActivity());
+/*                ImageView iv = new ImageView(cordova.getActivity());
                 int logotextid = activityRes.getIdentifier("logotext", "drawable", cordova.getActivity().getPackageName());
                 iv.setImageResource(logotextid);
                 RelativeLayout.LayoutParams lparams = new RelativeLayout.LayoutParams(
@@ -627,7 +631,7 @@ public class InAppBrowser extends CordovaPlugin {
                 lparams.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 lparams.addRule(RelativeLayout.CENTER_VERTICAL);
                 iv.setLayoutParams(lparams);
-                toolbar.addView(iv);
+                toolbar.addView(iv);*/
 
                 // Close/Done button
                 Button close = new Button(cordova.getActivity());
@@ -683,6 +687,33 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                 });
 
+
+                // Readability button setup
+                Button readability = new Button(cordova.getActivity());
+                RelativeLayout.LayoutParams readabilityLayoutParams = new RelativeLayout.LayoutParams(this.dpToPixels(40), this.dpToPixels(40));
+                readabilityLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                readability.setLayoutParams(readabilityLayoutParams);
+                readability.setId(6);
+
+                int readabilityResId = activityRes.getIdentifier("share_btn", "drawable", cordova.getActivity().getPackageName());
+
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
+                {
+                    Drawable icon = activityRes.getDrawable(readabilityResId);
+                    readability.setBackgroundDrawable(icon);
+                }
+                else
+                {
+                    readability.setBackgroundResource(readabilityResId);
+                }
+                readability.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d(LOG_TAG, "Toggle Readability");
+                        }
+                    }
+                );
+
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -727,12 +758,13 @@ public class InAppBrowser extends CordovaPlugin {
                 // Add the back and forward buttons to our action button container layout
                 //actionButtonContainer.addView(back);
                 //actionButtonContainer.addView(forward);
+                actionButtonContainer.addView(share);
+                actionButtonContainer.addView(readability);
 
                 // Add the views to our toolbar
-                //toolbar.addView(actionButtonContainer);
+                toolbar.addView(actionButtonContainer);
                 //toolbar.addView(edittext);
                 toolbar.addView(close);
-                toolbar.addView(share);
 
 
                 // Don't add the toolbar if its been disabled
