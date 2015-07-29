@@ -503,6 +503,9 @@ public class InAppBrowser extends CordovaPlugin {
 
         // Create dialog in new thread
         Runnable runnable = new Runnable() {
+
+
+            private boolean readability_lodaded = false;
             /**
              * Convert our DIP units to Pixels
              *
@@ -653,6 +656,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 close.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
+                        Log.d(LOG_TAG, "close button clicked");
                         closeDialog();
                     }
                 });
@@ -709,7 +713,18 @@ public class InAppBrowser extends CordovaPlugin {
                 readability.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Log.d(LOG_TAG, "Toggle Readability");
+                            if (readability_lodaded){
+                                Log.d(LOG_TAG, "reloading");
+                                String jsWrapper = "(function(d) { location.reload() })(document)";
+                                String code = "";
+                                injectDeferredObject(code, jsWrapper);
+                            } else {
+                                Log.d(LOG_TAG, "loading readability");
+                                String jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
+                                String readability = "https://attentive.us/static/js/lib/readability.js";
+                                injectDeferredObject(readability, jsWrapper);
+                            }
+                            readability_lodaded = !readability_lodaded;
                         }
                     }
                 );
