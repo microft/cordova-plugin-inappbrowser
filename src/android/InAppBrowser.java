@@ -553,7 +553,7 @@ public class InAppBrowser extends CordovaPlugin {
                 actionButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
                 actionButtonContainer.setId(1);
 
-                Resources activityRes = cordova.getActivity().getResources();
+                final Resources activityRes = cordova.getActivity().getResources();
 
                 // Back button
                 /*Button back = new Button(cordova.getActivity());
@@ -693,13 +693,15 @@ public class InAppBrowser extends CordovaPlugin {
 
 
                 // Readability button setup
-                Button readability = new Button(cordova.getActivity());
+                final Button readability = new Button(cordova.getActivity());
                 RelativeLayout.LayoutParams readabilityLayoutParams = new RelativeLayout.LayoutParams(this.dpToPixels(40), this.dpToPixels(40));
                 readabilityLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 readability.setLayoutParams(readabilityLayoutParams);
                 readability.setId(6);
 
-                int readabilityResId = activityRes.getIdentifier("share_btn", "drawable", cordova.getActivity().getPackageName());
+                final int readabilityResId = activityRes.getIdentifier("read_icon", "drawable", cordova.getActivity().getPackageName());
+                final int readabilityResIdOn = activityRes.getIdentifier("read_icon_on", "drawable", cordova.getActivity().getPackageName());
+
 
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
                 {
@@ -713,6 +715,7 @@ public class InAppBrowser extends CordovaPlugin {
                 readability.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            int iconId = readabilityResId;
                             if (readability_lodaded){
                                 Log.d(LOG_TAG, "reloading");
                                 String jsWrapper = "(function(d) { location.reload() })(document)";
@@ -721,10 +724,18 @@ public class InAppBrowser extends CordovaPlugin {
                             } else {
                                 Log.d(LOG_TAG, "loading readability");
                                 String jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
-                                String readability = "https://attentive.us/static/js/lib/readability.js";
-                                injectDeferredObject(readability, jsWrapper);
+                                String url = "https://attentive.us/static/js/lib/readability.js";
+                                injectDeferredObject(url, jsWrapper);
+                                iconId = readabilityResIdOn;
                             }
                             readability_lodaded = !readability_lodaded;
+
+                            if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                                Drawable icon = activityRes.getDrawable(iconId);
+                                readability.setBackgroundDrawable(icon);
+                            } else {
+                                readability.setBackgroundResource(iconId);
+                            }
                         }
                     }
                 );
